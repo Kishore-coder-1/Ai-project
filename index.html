@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LPU SmartWay | Campus Accessibility & Navigation Portal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top Institutional Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="brand-logo">LPU</div>
+      <div class="brand-text">
+        <span class="brand-title">SmartWay Campus Navigator</span>
+        <span class="brand-sub">Blocks 25–38 • Accessibility-Aware Multi-Floor Navigation System</span>
+      </div>
+    </div>
+
+    <div class="nav-links">
+      <button class="nav-tab active" data-view="navigator">Live Route Planner</button>
+      <button class="nav-tab" data-view="benchmark">AI Algorithm Benchmark</button>
+      <button class="nav-tab" data-view="directory">Block & Lift Directory</button>
+      <button class="nav-tab" data-view="about">System Architecture</button>
+    </div>
+  </nav>
+
+  <!-- VIEW 1: LIVE ROUTE PLANNER -->
+  <main id="view-navigator" class="view-section active">
+    <div class="planner-grid">
+      <!-- Left Sidebar: Route Configuration & Traveler Personas -->
+      <aside class="card sidebar-controls">
+        <h2>Route Configuration</h2>
+        <p class="helper-text">Select traveler persona & accessibility profile:</p>
+
+        <!-- Persona Order: 1. Normal Student (Default), 2. Faculty / Staff, 3. Handicapped, 4. Parent / Visitor -->
+        <div class="persona-grid" id="personaCards">
+          <div class="persona-card active" data-profile="student">
+            <div class="persona-top">
+              <strong>Normal Student</strong>
+              <span class="persona-icon">🎒</span>
+            </div>
+            <span>Fastest path via stairs, bridges & corridors.</span>
+          </div>
+
+          <div class="persona-card" data-profile="faculty">
+            <div class="persona-top">
+              <strong>Faculty / Staff</strong>
+              <span class="persona-icon">💼</span>
+            </div>
+            <span>Prefers lifts & low-crowd corridors.</span>
+          </div>
+
+          <div class="persona-card" data-profile="handicapped">
+            <div class="persona-top">
+              <strong>Handicapped / Wheelchair</strong>
+              <span class="persona-icon">♿</span>
+            </div>
+            <span>Step-free only: Lifts & ramps. Zero stairs.</span>
+          </div>
+
+          <div class="persona-card" data-profile="visitor">
+            <div class="persona-top">
+              <strong>Parent / Campus Visitor</strong>
+              <span class="persona-icon">🧭</span>
+            </div>
+            <span>Guided entrances & low physical effort.</span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Searchable Starting Point -->
+        <div class="form-group">
+          <label for="startInput">Starting Point</label>
+          <div class="search-combo">
+            <input
+              type="text"
+              id="startInput"
+              list="campusLocationsList"
+              placeholder="Search block, gate, or floor (e.g., Block 26)..."
+              autocomplete="off"
+            />
+            <button type="button" id="clearStartBtn" class="clear-input-btn" title="Clear starting point">×</button>
+          </div>
+        </div>
+
+        <button id="swapBtn" class="swap-btn" title="Swap Origin & Destination">⇅ Swap Locations</button>
+
+        <!-- Searchable Destination -->
+        <div class="form-group">
+          <label for="goalInput">Destination</label>
+          <div class="search-combo">
+            <input
+              type="text"
+              id="goalInput"
+              list="campusLocationsList"
+              placeholder="Search destination block or floor (e.g., Block 38)..."
+              autocomplete="off"
+            />
+            <button type="button" id="clearGoalBtn" class="clear-input-btn" title="Clear destination">×</button>
+          </div>
+        </div>
+
+        <datalist id="campusLocationsList"></datalist>
+
+        <div class="form-group">
+          <label for="algoSelect">Search Solver</label>
+          <select id="algoSelect">
+            <option value="ASTAR">A* Search (3D Admissible Heuristic)</option>
+            <option value="UCS">Uniform Cost Search (Dijkstra)</option>
+            <option value="BFS">Breadth-First Search (Unweighted Fewest Edges)</option>
+          </select>
+        </div>
+
+        <button id="findRouteBtn" class="btn-primary">Generate Route</button>
+
+        <hr class="divider" />
+
+        <h3>Live Campus Disruptions</h3>
+        <div class="toggle-list">
+          <label class="toggle-item">
+            <input type="checkbox" id="obsLift36" />
+            <span>Block 36 Lift Out of Service</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" id="obsLift30" />
+            <span>Block 30 Lift Out of Service</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" id="obsLift31" />
+            <span>Block 31 Lift Out of Service</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" id="obsBridge26_38" />
+            <span>Close 26 ↔ 38 (3rd Floor Skybridge)</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" id="obsCrowd36_38" />
+            <span>Heavy Crowd in 36–38 Complex</span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- Center: Architectural Campus Map & Multi-Floor Profile -->
+      <section class="card map-stage">
+        <div class="map-toolbar">
+          <div>
+            <h2>LPU Academic Complex (Blocks 25–38)</h2>
+            <span class="subtitle">Spatial blueprint: Entrances (|||), joined wings (30–31, 32–35, 36–38), and 3rd+ floor internal/skybridge links</span>
+          </div>
+          <div class="map-legend">
+            <span class="leg-item"><span class="ent-mini">|||</span> Block Entrance</span>
+            <span class="leg-item"><i class="dot lift"></i> Lift Block</span>
+            <span class="leg-item"><i class="dot bridge"></i> 3rd+ Link</span>
+            <span class="leg-item"><i class="dot route"></i> Active Route</span>
+          </div>
+        </div>
+
+        <div class="svg-wrapper" id="mapWrapper">
+          <div id="mapEmptyState" class="map-empty-state">
+            <div class="empty-icon">🗺️</div>
+            <h3>Ready to Plan Your Campus Route</h3>
+            <p>Select your traveler profile, search and choose a <strong>Starting Point</strong> and <strong>Destination</strong> on the left, and click <strong>Generate Route</strong> to view the multi-floor map and path.</p>
+          </div>
+          <svg id="campusSvg" viewBox="0 0 880 510" style="display:none;"></svg>
+        </div>
+
+        <div class="elevation-panel">
+          <div class="elev-header">
+            <strong>Multi-Floor Vertical Profile</strong>
+            <span id="floorSummaryTag">Awaiting route input</span>
+          </div>
+          <div id="floorStrip" class="floor-strip">
+            <span class="muted-hint">Enter starting point & destination to inspect floor transitions.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Sidebar: AI Decision & Explainability -->
+      <aside class="card output-panel">
+        <div class="card-header">
+          <h2>AI Decision & Explainability</h2>
+          <span id="activePersonaBadge" class="persona-badge">🎒 Student</span>
+        </div>
+
+        <div id="explanationBox" class="explain-alert">
+          Select a <strong>Starting Point</strong> and <strong>Destination</strong>, then click <strong>Generate Route</strong> to compute your personalized path.
+        </div>
+
+        <div class="kpi-grid" id="metricsBox"></div>
+
+        <div class="steps-header">
+          <h3>Turn-by-Turn Route Guidance</h3>
+          <span id="stepCountBadge" class="step-badge">0 steps</span>
+        </div>
+        <ol id="stepsList" class="timeline-steps">
+          <li style="list-style:none;color:#64748b;margin-left:-1.2rem;">No route generated yet. Enter your origin and destination to see step-by-step guidance.</li>
+        </ol>
+      </aside>
+    </div>
+  </main>
+
+  <!-- VIEW 2: AI ALGORITHM BENCHMARK -->
+  <section id="view-benchmark" class="view-section">
+    <div class="container-narrow">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Informed vs. Uninformed Search Algorithm Comparison</h2>
+            <p class="subtitle">Live evaluation on the active origin, destination, traveler profile, and disruptions. Note: BFS minimizes edge count (unweighted), whereas A* and UCS minimize multi-criteria weighted cost.</p>
+          </div>
+          <button id="runBenchmarkBtn" class="btn-primary" style="width:auto;margin:0;">Run Live Benchmark</button>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Heuristic / Strategy</th>
+              <th>Path Found</th>
+              <th>Edge Steps</th>
+              <th>Distance (m)</th>
+              <th>Est. Time</th>
+              <th>Physical Effort</th>
+              <th>Nodes Expanded</th>
+              <th>Runtime (ms)</th>
+            </tr>
+          </thead>
+          <tbody id="benchmarkTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: BLOCK & LIFT DIRECTORY -->
+  <section id="view-directory" class="view-section">
+    <div class="container-narrow">
+      <div class="card">
+        <h2>LPU Blocks 25–38 Infrastructure & Entrance Specification</h2>
+        <p class="subtitle">Floor counts (94 total across 14 blocks), lift availability, ground entrances, and Floor 3+ internal/skybridge connections.</p>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Block</th>
+              <th>Floors</th>
+              <th>Lift Access</th>
+              <th>Ground Entrances</th>
+              <th>Upper-Floor Inter-Block Connections (Floor 3+)</th>
+            </tr>
+          </thead>
+          <tbody id="directoryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 4: SYSTEM ARCHITECTURE -->
+  <section id="view-about" class="view-section">
+    <div class="container-narrow">
+      <div class="card">
+        <h2>System Architecture & AI Formulation (Group 16)</h2>
+        <div class="arch-grid">
+          <div class="arch-box">
+            <h3>1. Exact Campus Spatial Graph</h3>
+            <p>Models <strong>Blocks 25–38</strong> (94 floors total) with entrance locations: separated buildings (<code>25–30</code> and <code>31–32</code>) linked by elevated 3rd-floor skybridges, joined structures (<code>30–31</code>, <code>32–35</code>, and <code>36–37–38</code>) linked internally from Floor 3 upwards, plus cross-road bridges (<code>26 ↔ 38</code> and <code>28 ↔ 36–38</code>).</p>
+          </div>
+          <div class="arch-box">
+            <h3>2. Hard & Soft Accessibility Constraints</h3>
+            <p>For <strong>Handicapped / Wheelchair</strong> profiles, staircases receive infinite cost (<code>∞</code>), ramp entries apply gentle-slope detour distances, and horizontal cruising speed reflects safe wheelchair pacing (<code>1.4×</code> travel time vs. walking). Lifts move between consecutive floors in <code>5s</code> (<code>25m</code> shaft equivalent), while stairs take <code>20s</code> (<code>28m</code>).</p>
+          </div>
+          <div class="arch-box">
+            <h3>3. Admissible 3D Heuristic vs. Unweighted BFS</h3>
+            <p><strong>A* Search</strong> combines 2D planar distance with vertical floor delta to find the minimum-cost weighted path with far fewer node expansions than <strong>UCS</strong>, while <strong>BFS</strong> explores level-by-level in an unweighted graph to minimize total edge hops (often taking longer physical detours).</p>
+          </div>
+          <div class="arch-box">
+            <h3>4. Contrastive Explainability</h3>
+            <p>Compares the constrained accessible route against a shadow unconstrained student baseline to explain exact detours, lift selections, and avoided obstacles in plain English.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="campusGraph.js"></script>
+  <script src="pathfinder.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
